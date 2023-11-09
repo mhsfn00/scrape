@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Using script, css and html in oen file because it reminds me of vue -->
+    <script>
+        var productList = null; //Global variable maing things "easier"
+
+        function getProducts() {
+            loading();
+            keyword = document.getElementById("KeywordInput").value; //Getting whatever was written on the input when clicking "Scrape"
+            var xhttp = new XMLHttpRequest(); //New request of AJAX type (as of my understanding);
+            let url = `http://localhost:5000/api/scrape?keyword=${keyword}`;
+
+            xhttp.open("GET", url, true); //Modifying the request created at line 9
+
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    console.log("Request finishied and response ready");  
+                    productList = JSON.parse(this.response);  
+                    loadItems();       
+                } else {
+                    console.log("readyState:", this.readyState, "status:", this.status);
+                    // readyState : 2 => request received;
+                    // readyState : 3 => processing request;
+                }  
+            }
+
+            xhttp.send(); //Sending the request to the server
+        };
+
+        function loadItems() {
+            let productsContainer = document.getElementById("ProductList"); //Getting the div reserved for the product list 
+
+            productsContainer.innerHTML = ''; //Clearing the div (mostly in cases of new searches)
+            
+            productList.forEach(product => { //Adding a "product-card" for each item coming from the request (productList is global)
+                productsContainer.innerHTML += `
+                    <div class="product-card">
+                        <div class="product-image">
+                            <img class="actual-product-image" src=${product.image}>
+                        </div>
+                        <div class="product-info">
+                            <div class="product-title">
+                                <h3>${product.title}</h3>
+                                <p>${product.reviews} reviews</p>
+                            </div>
+                            <div class="product-extra-info">
+                                <p>Rating: ${product.rating}</p>
+                            </div>
+                        </div>
+                    </div>
+                ` 
+            });
+        };
+
+        function analyzeInput(e) { //Just so its possible to press enter on the search bar to execute the search
+            if (e.key === "Enter") {
+                getProducts();
+            }
+        }
+
+        function loading() { //Shows "LOADING" on the div reserved for the product list
+            document.getElementById("ProductList").innerHTML = `
+                <div class="loading-container">
+                    <h1>LOADING</h1>
+                </div>
+            `
+        }
+    </script>
+    <style>
+        /* Did the best i could with some basic css */
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 80vh;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            width: 100%;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            background-color: white;
+        }
+
+        .actual-product-image {
+            transform: scale(0.8);
+            object-fit: contain;
+            width: 20vw;
+            height: 20vh;
+        }
+
+        .product-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            padding: 0;
+            width: 50vw;
+        }
+
+        .input-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+        }
+
+        .products-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 10px;
+            padding-top: 30px;
+        }
+
+        .product-card {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            gap: 30px;
+        }
+
+        .checked {
+            color: rgb(255, 208, 0);
+        }
+
+        *{
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            padding: 0;
+            margin: 0;
+        }
+
+        #KeywordInput {
+            width: 400px;
+            height: 30px;
+            margin: 0;
+            border-left: 2px solid gray;
+            border-right: 0px;
+            border-top: 2px solid gray;
+            border-bottom: 2px solid gray;
+            border-radius: 5px 0px 0px 5px;
+            outline: 0;
+        }
+
+        #ScrapeButton {
+            width: 100px;
+            height: 36px;
+            margin: 0;
+            font-weight: 500;
+            border-left: 0px;
+            border-right: 2px solid gray;
+            border-top: 2px solid gray;
+            border-bottom: 2px solid gray;
+            border-radius: 0px 5px 5px 0px;
+            cursor: pointer;
+            background-color: rgb(216, 216, 216);
+        }
+    </style>
+    <title>Scrape</title>
+</head>
+<body>
+    <div class="header">
+        <div class="input-container">
+            <input id="KeywordInput" onkeyup="analyzeInput(event)" placeholder="Enter a product name"></input>
+            <button id="ScrapeButton" onclick="getProducts()">Scrape</button>
+        </div>
+    </div>
+    <div id="ProductList" class="products-container">
+    </div>
+</body>
+</html>
