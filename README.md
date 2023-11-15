@@ -1,8 +1,8 @@
 Project made with Node.js(express, axios and cheerio) for the backend
 HTML, css and javascript for the front-end (No css library needed)
 
-You might need to install the following dependencies:
-    npm install -g npm          (to install npm)
+Installing node: (there are multiple ways of doing this)
+    npm install -g npm          
 
 If you got these files from github this is a must:
     npm i express               (to install express for node.js)
