@@ -4,7 +4,7 @@ HTML, css and javascript for the front-end (No css library needed)
 Installing node: (there are multiple ways of doing this)
     npm install -g npm          
 
-If you got these files from github this is a must:
+If you got these files from github this is a must: (dependencies)
     npm i express               (to install express for node.js)
     npm i axios                 (to axios express for node.js)
     npm i cheerio               (to cheerio express for node.js)
